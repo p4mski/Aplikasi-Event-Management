@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -20,12 +21,14 @@ import com.example.uasmobileprogram.viewmodel.UiState
 @Composable
 fun EventListScreen(
     viewModel: EventViewModel,
-    onOpenDetail: (Int) -> Unit,
-    onAdd: () -> Unit
+    onAdd: () -> Unit,
+    onDetail: (Int) -> Unit
 ) {
     val state by viewModel.events.collectAsState()
 
-    // Load events once
+    var searchName by remember { mutableStateOf("") }
+    var searchDate by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         viewModel.fetchEvents()
     }
@@ -34,58 +37,58 @@ fun EventListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Events") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
                 actions = {
                     IconButton(onClick = onAdd) {
-                        Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                        Icon(Icons.Default.Add, contentDescription = "Add")
                     }
                 }
             )
-        }, containerColor = MaterialTheme.colorScheme.background
-    ) { inner ->
-        Box(
-            modifier = Modifier
-                .padding(inner)
-                .fillMaxSize()
+        }
+    ) { padding ->
+        Column(
+            Modifier
+                .padding(padding)
+                .padding(12.dp)
         ) {
+
+            // 🔍 Search by name
+            OutlinedTextField(
+                value = searchName,
+                onValueChange = { searchName = it },
+                label = { Text("Cari nama event") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            // 🔍 Search by date
+            OutlinedTextField(
+                value = searchDate,
+                onValueChange = { searchDate = it },
+                label = { Text("Cari berdasarkan tanggal (YYYY-MM-DD)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(16.dp))
+
             when (state) {
-                is UiState.Loading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-
-                is UiState.Error -> {
-                    Text(
-                        text = "Error: ${(state as UiState.Error).message}",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-
+                is UiState.Loading -> CircularProgressIndicator()
+                is UiState.Error -> Text("Error: ${(state as UiState.Error).message}")
                 is UiState.Success -> {
-                    val list = (state as UiState.Success<List<Event>>).data
+                    val events = (state as UiState.Success).data
 
-                    if (list.isEmpty()) {
-                        Box(
-                            Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("Tidak ada event.")
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(8.dp)
-                        ) {
-                            items(list) { event ->
-                                EventRow(
-                                    event = event,
-                                    onClick = { event.id?.let { onOpenDetail(it) } }
-                                )
+                    // 🔥 FILTER LIST
+                    val filtered = events.filter {
+                        (it.title.contains(searchName, ignoreCase = true)) &&
+                                (it.date.contains(searchDate, ignoreCase = true))
+                    }
+
+                    LazyColumn {
+                        items(filtered) { event ->
+                            EventCard(event) {
+                                onDetail(event.id!!)
                             }
+                            Spacer(Modifier.height(12.dp))
                         }
                     }
                 }
@@ -125,6 +128,27 @@ fun EventRow(event: Event, onClick: () -> Unit) {
                 text = "Status: ${event.status}",
                 style = MaterialTheme.typography.bodySmall
             )
+        }
+    }
+}
+
+@Composable
+fun EventCard(event: Event, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(event.title, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(4.dp))
+            Text("${event.date} - ${event.time}")
+            Text(event.location)
+            Text("Status: ${event.status}")
         }
     }
 }

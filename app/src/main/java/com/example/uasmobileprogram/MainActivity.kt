@@ -41,7 +41,7 @@ fun AppNav(vm: EventViewModel) {
         composable("list") {
             EventListScreen(
                 viewModel = vm,
-                onOpenDetail = { id -> navController.navigate("detail/$id") },
+                onDetail = { id -> navController.navigate("detail/$id") },
                 onAdd = { navController.navigate("form/new") }
             )
         }
