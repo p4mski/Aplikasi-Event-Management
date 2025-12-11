@@ -4,10 +4,12 @@ package com.example.uasmobileprogram.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.uasmobileprogram.data.model.Event
 import com.example.uasmobileprogram.viewmodel.EventViewModel
@@ -30,6 +32,8 @@ fun EventFormScreen(
     var location by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var capacityText by remember { mutableStateOf("") }
+
+    // dropdown value
     var status by remember { mutableStateOf("upcoming") }
 
     // Load event when editing
@@ -56,21 +60,26 @@ fun EventFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(if (eventId == null) "Buat Event" else "Edit Event")
-                },
+                title = { Text("Buat Event") },
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            Icons.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
                         )
                     }
                 },
-                actions = { }
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -84,7 +93,7 @@ fun EventFormScreen(
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = date,
@@ -92,7 +101,7 @@ fun EventFormScreen(
                 label = { Text("Date (YYYY-MM-DD)") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = time,
@@ -100,7 +109,7 @@ fun EventFormScreen(
                 label = { Text("Time (HH:MM:SS)") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = location,
@@ -108,7 +117,7 @@ fun EventFormScreen(
                 label = { Text("Location") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = description,
@@ -116,7 +125,7 @@ fun EventFormScreen(
                 label = { Text("Description") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = capacityText,
@@ -124,16 +133,16 @@ fun EventFormScreen(
                 label = { Text("Capacity") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
+            // ⬇⬇⬇ REPLACE STATUS INPUT WITH DROPDOWN ⬇⬇⬇
+            StatusDropdown(
                 value = status,
-                onValueChange = { status = it },
-                label = { Text("Status (upcoming/ongoing/completed/cancelled)") },
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { status = it }
             )
+            // ⬆⬆⬆ END DROPDOWN ⬆⬆⬆
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             Row {
                 Button(
@@ -167,11 +176,63 @@ fun EventFormScreen(
                     Text("Simpan")
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(Modifier.width(8.dp))
 
                 OutlinedButton(onClick = onCancel) {
                     Text("Batal")
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatusDropdown(
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    val items = listOf("upcoming", "ongoing", "completed", "cancelled")
+
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = { },
+            readOnly = true,
+            label = { Text("Status") },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = Color.DarkGray,
+                focusedLabelColor = Color.Black,
+                unfocusedLabelColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            ),
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            }
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item, color = Color.Black) },
+                    onClick = {
+                        onValueChange(item)
+                        expanded = false
+                    }
+                )
             }
         }
     }

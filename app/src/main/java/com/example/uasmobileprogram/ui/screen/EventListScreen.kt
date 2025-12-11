@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.uasmobileprogram.data.model.Event
 import com.example.uasmobileprogram.viewmodel.EventViewModel
@@ -33,16 +34,17 @@ fun EventListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Events") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 actions = {
                     IconButton(onClick = onAdd) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Add Event"
-                        )
+                        Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
                     }
                 }
             )
-        }
+        }, containerColor = MaterialTheme.colorScheme.background
     ) { inner ->
         Box(
             modifier = Modifier
@@ -95,12 +97,15 @@ fun EventListScreen(
 @Composable
 fun EventRow(event: Event, onClick: () -> Unit) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
         modifier = Modifier
-            .padding(vertical = 6.dp)
             .fillMaxWidth()
+            .padding(8.dp)
             .clickable(onClick = onClick)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+    ) { Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = event.title,
                 style = MaterialTheme.typography.titleMedium

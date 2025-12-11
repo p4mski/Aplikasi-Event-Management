@@ -2,30 +2,22 @@ package com.example.uasmobileprogram.ui.theme
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = PinkDarkPrimary,
-    onPrimary = PinkDarkOnPrimary,
-    primaryContainer = PinkDarkPrimaryContainer,
-    onPrimaryContainer = Color.White,
+private val PinkColorScheme = lightColorScheme(
+    primary = PinkTopBar,
+    onPrimary = PinkOnPrimary,
 
-    secondary = PinkDarkSecondary,
-    onSecondary = PinkDarkOnSecondary,
+    background = PinkLightBackground,
+    onBackground = PinkOnBackground,
 
-    background = PinkDarkBackground,
-    onBackground = PinkDarkOnBackground,
-
-    surface = PinkDarkSurface,
-    onSurface = PinkDarkOnSurface,
+    surface = PinkCard,
+    onSurface = PinkOnCard
 )
 
 @Composable
-fun UASMobileProgramTheme(
-    content: @Composable () -> Unit
-) {
+fun UASMobileProgramTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = PinkColorScheme,
         typography = Typography,
         content = content
     )

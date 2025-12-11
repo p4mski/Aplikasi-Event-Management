@@ -11,6 +11,7 @@ import com.example.uasmobileprogram.viewmodel.EventViewModel
 import com.example.uasmobileprogram.viewmodel.UiState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,31 +29,24 @@ fun EventDetailScreen(
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
-    Scaffold(topBar = {
+    Scaffold(
+        topBar = {
         TopAppBar(
-            title = { Text("Events") },
+            title = { Text("Event Detail") },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                titleContentColor = Color.White,
+                navigationIconContentColor = Color.White
             )
         )
 
-        TopAppBar(
-            title = { Text("Event Detail") },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            actions = {
-                TextButton(onClick = onEdit) { Text("Edit") }
-                TextButton(onClick = { showDeleteConfirm = true }) { Text("Delete") }
-            }
-        )
-    }) { inner ->
+    }, containerColor = MaterialTheme.colorScheme.background)
+    { inner ->
         Box(modifier = Modifier.padding(inner).padding(12.dp)) {
             when (state) {
                 is UiState.Loading -> {
